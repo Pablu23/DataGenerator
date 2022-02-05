@@ -1,8 +1,15 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Net;
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using DataGeneratorMVC.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+using Microsoft.VisualBasic;
+using Newtonsoft.Json;
+using JsonConverter = System.Text.Json.Serialization.JsonConverter;
 
 namespace DataGeneratorMVC.Controllers;
 
@@ -47,61 +54,72 @@ public class HomeController : Controller
     private void GenerateNew(GeneratorDataViewModel model)
     {
         var tmp = DataGenerator.Generate(model.Settings);
-        var labelsSb = new StringBuilder();
-        labelsSb.Append("[");
-        var dataSb = new StringBuilder();
-        dataSb.Append("[");
         
-        // var allDataSets = new StringBuilder();
-        //
-        // string datasetTemplate = "{{label: '{0}', data: {1}, backgroundColor: [\'rgba({2}, {3}, {4}, 0.2)\'], borderColor: [\'rgba(255, 99, 132, 1)\'], fill: false, tension: 0.4, spangaps: true}}{5} ";
-        //
-        // double[,] years = new double[model.Settings.Years, 366];
-        //
-        // foreach (var turnover in tmp)
-        // {
-        //     years[turnover.Key.Year - model.Settings.StartYear, turnover.Key.DayOfYear - 1] = turnover.Value;
-        // }
-        //
-        // for (int i = 0; i < model.Settings.Years; i++)
-        // {
-        //     var dataSb = new StringBuilder();
-        //     dataSb.Append("[");
-        //     for (int j = 0; j < 366; j++)
-        //     {
-        //         if(years[i, j] != 0)
-        //             dataSb.Append($"{years[i, j].ToString("0.00").Replace(',', '.')}, ");
-        //         else
-        //             dataSb.Append($"{years[i, j-1].ToString("0.00").Replace(',', '.')}, ");
-        //     }
-        //     dataSb.Append("]");
-        //     allDataSets.Append(string.Format(datasetTemplate, model.Settings.StartYear + i, 
-        //         dataSb.ToString(), 255, 99 + i, 132 + i, i-1 == model.Settings.Years ? "" : ","));
-        //     dataSb.Clear();
-        // }
-        //
-        // for (int i = 0; i < 366; i++)
-        // {
-        //     labelsSb.Append($"{i}, ");
-        // }
-
-        int counter = 0;
+        var labels = new List<double>();
         
-        foreach (var value in tmp)
+        for (int i = 0; i < tmp.Count; i++)
         {
-            counter++;
-            labelsSb.Append($"{counter}, ");
-            //labels.Append($"{value.Key}, ");
-            dataSb.Append($"{value.Value.ToString("0.00").Replace(',', '.')}, ");
+            labels.Add(i);
         }
 
-        labelsSb.Append("]");
-        dataSb.Append("]");
+        var datasets = new List<Dataset>();
+        datasets.Add(new Dataset("Umsatz", tmp.Values, "rgba(255, 99, 132, 0.2)", "rgba(255, 99, 132, 1)", false, 0.4f, true));
+        
+        var trendline = new Trendline( new List<double>(tmp.Values), labels);
+
+        var average = new Collection<double>();
+        var minimum = new Collection<double>();
+        var maximum = new Collection<double>();
+        var summed = new Collection<double>();
+        var trend = new Collection<double>();
+        var trendStandardDeviationUp = new Collection<double>();
+        var trendStandardDeviationDown = new Collection<double>();
+
+        
+        double stdDeviation = StandardDeviation(tmp.Values);
+        double avg = tmp.Values.Average();
+        double min = tmp.Values.Min();
+        double max = tmp.Values.Max();
+        
+        for (int i = 0; i < labels.Count; i++)
+        {
+            double trendValue = trendline.GetYValue(i);
+            
+            average.Add(avg);
+            minimum.Add(min);
+            maximum.Add(max);
+            
+            trendStandardDeviationUp.Add(trendValue + stdDeviation);
+            trendStandardDeviationDown.Add(trendValue - stdDeviation);
+            trend.Add(trendValue);
+        }
+        
+        datasets.Add(new Dataset("Trendlinie", trend){BorderColor = "rgba(11,127,171)"});
+        datasets.Add(new Dataset("Standard Deviation Up", trendStandardDeviationUp){BorderColor = "rgba(0,181,204)"});
+        datasets.Add(new Dataset("Standard Deviation Down", trendStandardDeviationDown){BorderColor = "rgba(0,181,204)"});
+        datasets.Add(new Dataset("Average", average){BorderColor = "rgba(8,14,44)"});
+        datasets.Add(new Dataset("Min", minimum){BorderColor = "rgba(8,14,44)"});
+        datasets.Add(new Dataset("Max", maximum){BorderColor = "rgba(8,14,44)"});
+
+
         model.Sql = DataGenerator.Save(tmp);
-        model.DataSet = dataSb.ToString();
-        model.LabelSet = labelsSb.ToString();
+        model.DataSet = JsonConvert.SerializeObject(datasets, new JsonSerializerSettings(){NullValueHandling = NullValueHandling.Ignore});
+        model.LabelSet = JsonConvert.SerializeObject(labels);
     }
 
+    private static double StandardDeviation(IEnumerable<double> sequence)
+    {
+        double result = 0;
+
+        if (sequence.Any())
+        {
+            double average = sequence.Average();
+            double sum = sequence.Sum(d => Math.Pow(d - average, 2));
+            result = Math.Sqrt((sum) / (sequence.Count() - 1));
+        }
+        return result;
+    }
+    
     public IActionResult Privacy()
     {
         return View();

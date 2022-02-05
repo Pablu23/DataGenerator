@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DataGeneratorMVC;
 
-[Bind("StartYear,Years,MinDiff,MaxDiff,HasSin,Smoothing,RSmoothing,MinSmoothing,MaxSmoothing,StartTurnover,Linear,HasPeak,PeakLength,PeakStrength,RPeakInYear,PeakInYear")]
-public class GeneratorSettings
+//[Bind("StartYear,Years,MinDiff,MaxDiff,HasSin,Smoothing,RSmoothing,MinSmoothing,MaxSmoothing,StartTurnover,Linear,HasPeak,PeakLength,PeakStrength,RPeakInYear,PeakInYear")]
+public class GeneratorSettings : IValidatableObject
 {
     [Range(1500,3000)]
     public int StartYear { get; set; }
@@ -25,12 +25,14 @@ public class GeneratorSettings
     public int MaxSmoothing { get; set; }
     [DataType(DataType.Currency)]
     public double StartTurnover { get; set; }
-
+    public double Linear { get; set; }
     public bool HasSin { get; set; }
-    public int Linear { get; set; }
+    public double SinStrength { get; set; }
+    public double SinLength { get; set; }
+    public bool SinNegative { get; set; }
     public bool HasPeak { get; set; }
-    public int PeakLength { get; set; }
-    public int PeakStrength { get; set; }
+    public double PeakLength { get; set; }
+    public double PeakStrength { get; set; }
     public bool RPeakInYear { get; set; }
     public int PeakInYear { get; set; }
     
@@ -51,11 +53,23 @@ public class GeneratorSettings
         MinSmoothing = Clamp(minSmoothing, 1, 100);
         MaxSmoothing = Clamp(maxSmoothing, 1, 100);
         StartTurnover = startTurnover;
+        SinLength = 182.5;
+        SinStrength = 10;
+        SinNegative = true;
     }
 
     private static int Clamp(int value, int min, int max)
     {
         return (value < min) ? min : (value > max) ? max : value;
+    }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (HasPeak && (PeakLength < 1 || PeakStrength < 1 || RPeakInYear == false && 1 > PeakInYear && PeakInYear < 360))
+            yield return new ValidationResult("If Peak is enabled, all Peak settings must be set", new []{nameof(HasPeak), nameof(PeakLength), nameof(PeakStrength), nameof(RPeakInYear), nameof(PeakInYear)});
+        
+        if (HasSin && (SinLength < 1 || SinStrength < 1))
+            yield return new ValidationResult("If Sin is enabled, all Sin settings must be set", new []{nameof(HasSin), nameof(SinLength), nameof(SinStrength)});
     }
 }
 
@@ -74,11 +88,11 @@ public static class DataGenerator
         int smoothing = settings.Smoothing;
 
         int counter = 0;
-        int linear = settings.Linear;
+        double linear = settings.Linear;
         
         int peakInYear = settings.RPeakInYear ? _r.Next(10, 350) : settings.PeakInYear;
-        int peakLength = settings.PeakLength;
-        int peakStrength = settings.PeakStrength;
+        double peakLength = settings.PeakLength;
+        double peakStrength = settings.PeakStrength;
         int peakCounter = 0;
 
         for (int year = 0; year < settings.Years; year++)
@@ -119,7 +133,12 @@ public static class DataGenerator
                         currentCurve += _r.Next(minDiff, maxDiff + 1);
 
                     if(settings.HasSin)
-                        currentCurve += -(10 * Math.Sin(counter * Math.PI / 182.5));
+                        currentCurve += settings.SinNegative switch
+                        {
+                            true => -(settings.SinStrength * Math.Sin(counter * Math.PI / settings.SinLength)),
+                            false => (settings.SinStrength * Math.Sin(counter * Math.PI / settings.SinLength)) //182.5
+                        };
+
                     currentCurve += linear;
 
                     // If it is the first Day of the Simulation start
