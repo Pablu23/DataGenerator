@@ -1,0 +1,142 @@
+﻿@model GeneratorDataViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+
+<style>
+    .NoBreak{
+        display: inline;
+    }
+</style>
+
+<div>
+    <canvas class="my-4 h-25" id="myChart"></canvas>
+</div>
+<div>
+    <h3>Settings</h3>
+    @using (Html.BeginForm("Index", "Home", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <div>
+            <div>
+                @Html.LabelFor(model => model.Settings.StartYear, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.StartYear)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.Years, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.Years)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.StartTurnover, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.StartTurnover)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.MaxDiff, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.MaxDiff)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.MinDiff, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.MinDiff)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.RSmoothing, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.RSmoothing)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.MaxSmoothing, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.MaxSmoothing)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.MinSmoothing, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.MinSmoothing)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.Smoothing, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.Smoothing)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.Linear, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.Linear)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.HasSin, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.HasSin)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.HasPeak, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.HasPeak)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.PeakLength, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.PeakLength)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.PeakStrength, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.PeakStrength)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.RPeakInYear, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.RPeakInYear)
+            </div>
+
+            <div>
+                @Html.LabelFor(model => model.Settings.PeakInYear, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.PeakInYear)
+            </div>
+
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-primary" name="cmd" value="generate">Generate New</button>
+            <button type="submit" class="btn btn-primary" name="cmd" value="save">Save</button>
+        </div>
+
+        <input type="hidden" id="Sql" name="Sql" value="@Model.Sql"/>
+        <input type="hidden" id="DataSet" name="DataSet" value="@Model.DataSet"/>
+        <input type="hidden" id="LabelSet" name="LabelSet" value="@Model.LabelSet"/>
+    }
+</div>
+
+<script type="text/javascript">
+const ctx = document.getElementById('myChart').getContext('2d');
+const myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: @Model.LabelSet,
+        datasets: [{
+            label: 'Umsatz',
+            data: @Model.DataSet,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)'
+            ],
+            fill: false,
+            tension: 0.4,
+            spangaps: true
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            x: {
+                display: true,
+                title: {
+                    display: true
+            }
+            },
+            y: {
+                display: true,
+                title: {
+                      display: true,
+                      text: 'Value'
+                },
+                suggestedMin: -10,
+                suggestedMax: 200
+           }
+        },
+        radius: 0
+    }
+});
+</script>
