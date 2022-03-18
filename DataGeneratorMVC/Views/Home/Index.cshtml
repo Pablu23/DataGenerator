@@ -16,103 +16,104 @@
 </div>
 <div>
     <h3>Settings</h3>
-    @using (Html.BeginForm("Index", "Home", FormMethod.Post))
-    {
-        @Html.AntiForgeryToken()
+    @* @using (Html.BeginForm("Index", "Home", FormMethod.Post)) *@
+    @* { *@
+    @*     @Html.AntiForgeryToken() *@
+    <form enctype="multipart/form-data" asp-controller="Home" asp-action="Index" method="post">
         <div>
             <div>
                 @Html.LabelFor(model => model.Settings.StartYear, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.StartYear)
-                @Html.ValidationMessageFor(model => model.Settings.StartYear, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.StartYear, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.Years, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.Years)
-                @Html.ValidationMessageFor(model => model.Settings.Years, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.Years, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.StartTurnover, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.StartTurnover)
-                @Html.ValidationMessageFor(model => model.Settings.StartTurnover, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.StartTurnover, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.MaxDiff, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.MaxDiff)
-                @Html.ValidationMessageFor(model => model.Settings.MaxDiff, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.MaxDiff, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.MinDiff, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.MinDiff)
-                @Html.ValidationMessageFor(model => model.Settings.MinDiff, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.MinDiff, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.RSmoothing, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.RSmoothing)
-                @Html.ValidationMessageFor(model => model.Settings.RSmoothing, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.RSmoothing, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.MaxSmoothing, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.MaxSmoothing)
-                @Html.ValidationMessageFor(model => model.Settings.MaxSmoothing, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.MaxSmoothing, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.MinSmoothing, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.MinSmoothing)
-                @Html.ValidationMessageFor(model => model.Settings.MinSmoothing, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.MinSmoothing, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.Smoothing, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.Smoothing)
-                @Html.ValidationMessageFor(model => model.Settings.Smoothing, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.Smoothing, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.Linear, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.Linear)
-                @Html.ValidationMessageFor(model => model.Settings.Linear, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.Linear, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.HasSin, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.HasSin)
-                @Html.ValidationMessageFor(model => model.Settings.HasSin, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.HasSin, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.SinLength, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.SinLength)
-                @Html.ValidationMessageFor(model => model.Settings.SinLength, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.SinLength, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.SinStrength, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.SinStrength)
-                @Html.ValidationMessageFor(model => model.Settings.SinStrength, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.SinStrength, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.SinNegative, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.SinNegative)
-                @Html.ValidationMessageFor(model => model.Settings.SinNegative, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.SinNegative, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.HasPeak, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.HasPeak)
-                @Html.ValidationMessageFor(model => model.Settings.HasPeak, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.HasPeak, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.PeakLength, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.PeakLength)
-                @Html.ValidationMessageFor(model => model.Settings.PeakLength, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.PeakLength, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.PeakStrength, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.PeakStrength)
-                @Html.ValidationMessageFor(model => model.Settings.PeakStrength, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.PeakStrength, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.RPeakInYear, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.RPeakInYear)
-                @Html.ValidationMessageFor(model => model.Settings.RPeakInYear, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.RPeakInYear, "", new {@class = "text-danger"})
             </div>
 
             <div>
                 @Html.LabelFor(model => model.Settings.PeakInYear, new {@class = "control-label col-md-1"}) @Html.EditorFor(model => model.Settings.PeakInYear)
-                @Html.ValidationMessageFor(model => model.Settings.PeakInYear, "",new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.Settings.PeakInYear, "", new {@class = "text-danger"})
             </div>
 
         </div>
@@ -120,12 +121,18 @@
         <div>
             <button type="submit" class="btn btn-primary" name="cmd" value="generate">Generate New</button>
             <button type="submit" class="btn btn-primary" name="cmd" value="save">Save</button>
+            <div>
+                <button type="submit" class="btn btn-primary" name="cmd" value="upload">Upload</button>
+                <input type="file" name="file" class="btn"/>
+            </div>
         </div>
 
         <input type="hidden" id="Sql" name="Sql" value="@Model.Sql"/>
         <input type="hidden" id="DataSet" name="DataSet" value="@Model.DataSet"/>
         <input type="hidden" id="LabelSet" name="LabelSet" value="@Model.LabelSet"/>
-    }
+    </form>
+
+    @*}*@
 </div>
 
 <script type="text/javascript">

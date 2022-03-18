@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using DataGeneratorMVC.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
@@ -31,7 +32,7 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public IActionResult Index(GeneratorDataViewModel model, string cmd)
+    public IActionResult Index(GeneratorDataViewModel model, string cmd, IFormFile? file)
     {
         if (ModelState.IsValid)
         {
@@ -44,16 +45,45 @@ public class HomeController : Controller
                         break;
                     case "save":
                         return File(Encoding.UTF8.GetBytes(model.Sql), "text/plain", "sql_insert.sql");
+                    case "upload":
+                        Upload(model, file);
+                        break;
                 }
             }
         }
 
         return View(model);
     }
-
-    private void GenerateNew(GeneratorDataViewModel model)
+    
+    private void Upload(GeneratorDataViewModel model, IFormFile up)
     {
-        var tmp = DataGenerator.Generate(model.Settings);
+
+        var rgx = new Regex(@"(?<=\()(.*)(?=\))"); // Match only values of SQL Statement
+        var dict = new Dictionary<DateTime, double>();
+
+        using (var reader = new StreamReader(up.OpenReadStream()))
+        {
+            while (reader.Peek() >= 0)
+            {
+                string line = reader.ReadLine();
+                line = rgx.Match(line).Value;
+                string[] inputs = line.Split(",");
+                dict.Add(DateTime.Parse(inputs[1].Replace("\'", "")), Double.Parse(inputs[2]));
+            }
+        }
+        
+        //var model = new GeneratorDataViewModel();
+        GenerateNew(model, dict);
+    }
+    
+    private void GenerateNew(GeneratorDataViewModel model, Dictionary<DateTime, double>? input = null)
+    {
+        Dictionary<DateTime, double> tmp;
+        if (input != null)
+            tmp = input;
+        else
+            tmp = DataGenerator.Generate(model.Settings);
+        
         
         var labels = new List<double>();
         
